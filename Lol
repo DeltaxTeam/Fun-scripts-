@@ -1,0 +1,69 @@
+local player = game.Players.LocalPlayer
+local flyEnabled = false
+local otherPlayer = nil
+
+local function enableFly()
+    if flyEnabled then
+        return
+    else
+        player.Character:FindFirstChildOfClass("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Flying, true)
+        flyEnabled = true
+    end
+end
+
+local function disableFly()
+    if not flyEnabled then
+        game.StarterGui:SetCore("SendNotification", {
+            Title = "Error",
+            Text = "You have not activated 'Fly'.",
+            Duration = 3
+        })
+    else
+        player.Character:FindFirstChildOfClass("Humanoid"):SetStateEnabled(Enum.HumanoidStateType.Flying, false)
+        flyEnabled = false
+    end
+end
+
+local function switchToOtherPlayer()
+    local playerName = script.Parent.TextBox.Text
+    
+    if playerName == "" then
+        game.StarterGui:SetCore("SendNotification", {
+            Title = "Error",
+            Text = "The textbox is empty.",
+            Duration = 3
+        })
+        return
+    end
+    
+    otherPlayer = game.Players:FindFirstChild(playerName)
+    
+    if otherPlayer then
+        game.Workspace.CurrentCamera.CameraSubject = otherPlayer.Character.Humanoid
+    else
+        game.StarterGui:SetCore("SendNotification", {
+            Title = "Error",
+            Text = "Player not found.",
+            Duration = 3
+        })
+    end
+end
+
+local function switchToOwnScreen()
+    if not otherPlayer then
+        game.StarterGui:SetCore("SendNotification", {
+            Title = "Error",
+            Text = "You are in your screen.",
+            Duration = 3
+        })
+        return
+    end
+    
+    game.Workspace.CurrentCamera.CameraSubject = player.Character.Humanoid
+    otherPlayer = nil
+end
+
+script.Parent.FlyButton.MouseButton1Click:Connect(enableFly)
+script.Parent.UnflyButton.MouseButton1Click:Connect(disableFly)
+script.Parent.SwitchButton.MouseButton1Click:Connect(switchToOtherPlayer)
+script.Parent.BackButton.MouseButton1Click:Connect(switchToOwnScreen)
